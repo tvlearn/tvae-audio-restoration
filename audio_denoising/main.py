@@ -5,7 +5,6 @@
 import os
 import sys
 import h5py
-import imageio
 import numpy as np
 import torch as to
 import matplotlib.pyplot as plt
@@ -17,9 +16,8 @@ from tvo.utils.param_init import init_sigma2_default
 
 from tvutil.prepost import OverlappingPatches
 
-from params import get_args #!TODO: switch between param files
-from utils import stdout_logger, store_as_h5, eval_fn, eval_fn_wav
-#from decoder import FCNet
+from params import get_args 
+from utils import stdout_logger, store_as_h5, eval_fn
 
 import soundfile as sf
 import librosa
@@ -49,30 +47,40 @@ def audio_denoising():
     print("Will write training output to {}.".format(training_file))
     print("Will write terminal output to {}".format(txt_file))
 
+    # read in the clean audio file at 16kHz
     clean, sr = librosa.load(args.clean_audio_file, sr=16000) 
     clean = to.tensor(clean).to(**dtype_device_kwargs) 
 
-    clean = to.tensor(clean).to(**dtype_device_kwargs)
+    # normalize if normalization is given 
     clean = clean / args.norm if args.norm is not None else clean
-    sigma = args.sigma / args.norm if args.norm is not None else args.sigma
 
-    #noisy = clean + sigma * to.randn_like(clean) #TODO: make choice var here!
-    noisy, sr = librosa.load(args.noisy_audio_file, sr=16000)
-    noisy = to.tensor(noisy).to(**dtype_device_kwargs)
+    # choose whether a noisy file should be used 
+    if args.use_noisy:
+        noisy, sr = librosa.load(args.noisy_audio_file, sr=16000)
+        noisy = to.tensor(noisy).to(**dtype_device_kwargs)
+    # or noise with sigma std is added to the clean signal and used as noisy
+    else:
+        sigma = args.sigma / args.norm if args.norm is not None else args.sigma
+        noisy = clean + sigma * to.randn_like(clean) 
 
+    # write noisy file to the output directory
     wav_file = f"{args.output_directory}/noisy-{args.sigma}-std.wav"
     noisy_wav = noisy.detach().cpu().numpy()
     sf.write(wav_file, noisy_wav, sr)
 
+    # overlapping audio "chunks" are extracted (here called "patches")
     ovp = OverlappingPatches(noisy[None, ...], args.patch_height, args.patch_width, patch_shift=1)
     train_data = ovp.get().t()
     store_as_h5({"data": train_data}, data_file)
 
-    D = args.patch_height * args.patch_width
+    # T: observed data dimension / chunk size
+    T = args.patch_height * args.patch_width
     with h5py.File(data_file, "r") as f:
         data = to.tensor(f["data"][...])
-    N, D_read = data.shape
-    assert D == D_read
+    # N: number of training/inference datapoints
+    N, T_read = data.shape
+    assert T == T_read
+    # initialize model parameter sigma
     sigma2_init = (
         (to.sqrt(init_sigma2_default(data, **dtype_device_kwargs)) / args.norm).pow(2)
         if args.norm is not None
@@ -85,7 +93,7 @@ def audio_denoising():
     # initialize model
     model = GaussianTVAE(
         shape=[
-            D,
+            T,
         ]
         + args.inner_net_shape,
         min_lr=args.min_lr,
@@ -124,24 +132,24 @@ def audio_denoising():
         conf=exp_config, estep_conf=estep_conf, model=model, train_data_file=data_file
     )
     logger, trainer = exp.logger, exp.trainer
-    # append the noisy image to the data logger
+    # append the noisy audio to the data logger
     logger.set_and_write(noisy_image=noisy)
 
     # run epochs
     for epoch, summary in enumerate(exp.run(args.no_epochs)):
         summary.print()
 
-        # merge reconstructed image patches and generate reconstructed image
+        # merge reconstructed audio chunks and generate reconstructed audio
         merge = ((epoch - 1) % args.merge_every) == 0
         assert hasattr(trainer, "train_reconstruction")
         reco = ovp.set_and_merge(trainer.train_reconstruction.t()) if merge else None
 
-        # visualize epoch
+        # save audio files if merge
         if merge:
-            #TODO: combine eval_fn and eval_fn_wav!
-            psnr = eval_fn(clean[None, ...], reco) 
-            snr, pesq = eval_fn_wav(clean[None, ...], reco) 
+            # calculate the objective metrics
+            psnr, snr, pesq = eval_fn(clean[None, ...], reco) 
             to_log = {"reco_image": reco, "snr": snr, "pesq": pesq, "psnr": psnr}
+            # add to log 
             if to_log is not None:
                 logger.append_and_write(**to_log)
             snr_str = f"{snr:.2f}".replace(".", "_")

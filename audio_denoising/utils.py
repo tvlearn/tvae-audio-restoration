@@ -54,42 +54,48 @@ def eval_fn(
     reco: Union[np.ndarray, to.Tensor],
     data_range: int = None,
 ) -> to.Tensor:
+    """
+    Takes the ground truth audio and the reconstruction and outputs 
+    the computed PSNR, SNR and PESQ measures
+    """
     return to.tensor(
         peak_signal_noise_ratio(
             target.detach().cpu().numpy() if isinstance(target, to.Tensor) else target,
             reco.detach().cpu().numpy() if isinstance(reco, to.Tensor) else reco,
             data_range=data_range,
-        )
-    )
-
-def eval_fn_wav(
-    target: Union[np.ndarray, to.Tensor],
-    reco: Union[np.ndarray, to.Tensor],
-    data_range: int = 255,
-) -> to.Tensor:
-    return to.tensor(
+        )), to.tensor(
         compute_snr_metric(
             target.detach().cpu().numpy() if isinstance(target, to.Tensor) else target,
             reco.detach().cpu().numpy() if isinstance(reco, to.Tensor) else reco
-        )
-    ), to.tensor(
+        )), to.tensor(
         compute_pesq_metric(
             target.detach().cpu().numpy() if isinstance(target, to.Tensor) else target,
             reco.detach().cpu().numpy() if isinstance(reco, to.Tensor) else reco
-        )
-    )
+        ))
 
 def compute_SNR(ref, est):
+        """
+        Computing signal-to-noise ratio (SNR) between the reconstucted 
+        signal and ground truth (target)
+        """
         snr =  np.sum(ref**2) / np.sum((ref-est)**2)  
         snr = 10*np.log10(snr)
         return snr.round(decimals=2)
 
 def compute_snr_metric(clean, reconstructed: to.Tensor) -> int:
+        """
+        Computing signal-to-noise ratio (SNR) between the reconstucted 
+        signal and ground truth (target)
+        """
         assert reconstructed.shape == clean.shape
         snr = compute_SNR(clean, np.clip(reconstructed, -1.0, 1.0))
         return snr
 
 def compute_pesq_metric(clean, reconstructed: to.Tensor) -> int:
+        """
+        Computing PESQ wideband measure (Source: https://github.com/ludlows/PESQ) 
+        between the reconstucted signal and ground truth (target)
+        """
         assert reconstructed.shape == clean.shape
         reconstructed = reconstructed[0, :]
         clean = clean[0, :]

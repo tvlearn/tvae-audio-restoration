@@ -6,12 +6,14 @@ import argparse
 import time
 import datetime
 import os
+from distutils.util import strtobool
 
 
 def get_args():
     p = argparse.ArgumentParser(description="Gaussian Denoising")
-    p.add_argument('-ddc', '--clean-audio-file', default='.../target.wav', type=str)
-    p.add_argument('-ddn', '--noisy-audio-file', default='.../noisy.wav', type=str)
+    p.add_argument('-ddc', '--clean-audio-file', default='./audio/target.wav', type=str)
+    p.add_argument('-ddn', '--noisy-audio-file', default='./audio/noisy.wav', type=str)
+    p.add_argument('-un', '--use-noisy', default=False, type=lambda x: bool(strtobool(x)))
     p.add_argument('-sig', '--sigma', default=0.1, type=float)
     p.add_argument('-ph', '--patch-height', default=1, type=int)
     p.add_argument('-pw', '--patch-width', default=400, type=int)
@@ -33,7 +35,7 @@ def get_args():
     args = p.parse_args()
 
 
-    args.output_directory = ".../out/{}".format(
+    args.output_directory = "./out/{}".format(
         os.environ["SLURM_JOBID"]
         if "SLURM_JOBID" in os.environ
         else datetime.datetime.fromtimestamp(time.time()).strftime("%y-%m-%d-%H-%M-%S")

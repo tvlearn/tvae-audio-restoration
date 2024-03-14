@@ -12,7 +12,7 @@ def get_args():
     p = argparse.ArgumentParser(
         description="Audio inpainting with missing excerpts (masks) of 0.1-0.25 seconds"
     )
-    p.add_argument('-ddc', '--clean-audio-file', default=".../target.wav", type=str)
+    p.add_argument('-ddc', '--clean-audio-file', default="./audio/target.wav", type=str)
     p.add_argument('-md', '--mask-duration', default=0.002, type=float)
     p.add_argument('-nm', '--num-masks', default=1, type=float)
     p.add_argument('-p', '--percentage', default=80, type=int)
