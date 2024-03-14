@@ -29,6 +29,7 @@ PRECISION = to.float32
 dtype_device_kwargs = {"dtype": PRECISION, "device": DEVICE}
 
 def audio_denoising():
+    # start time
     start_time = time.time()
     # get hyperparameters
     args = get_args()
@@ -39,7 +40,7 @@ def audio_denoising():
     # determine directories to save output
     os.makedirs(args.output_directory, exist_ok=True)
     data_file, training_file = (
-        args.output_directory + "/image_patches.h5",
+        args.output_directory + "/audio_chunks.h5",
         args.output_directory + "/training.h5",
     )
     txt_file = args.output_directory + "/terminal.txt"
@@ -149,7 +150,7 @@ def audio_denoising():
             # calculate the objective metrics
             psnr, snr, pesq = eval_fn(clean[None, ...], reco) 
             to_log = {"reco_image": reco, "snr": snr, "pesq": pesq, "psnr": psnr}
-            # add to log 
+            # add to data logger 
             if to_log is not None:
                 logger.append_and_write(**to_log)
             snr_str = f"{snr:.2f}".replace(".", "_")
@@ -162,6 +163,7 @@ def audio_denoising():
 
     print("Finished")
     end_time = time.time()
+    # calculate and print runtime
     print("Runtime: " + str(end_time-start_time) + ' seconds')
 
 

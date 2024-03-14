@@ -10,7 +10,7 @@ import os
 
 def get_args():
     p = argparse.ArgumentParser(
-        description="Audio inpainting with missing excerpts (masks) of 0.1-0.25 seconds"
+        description="Audio inpainting with missing excerpts (masks) of 0.001-0.005 seconds"
     )
     p.add_argument('-ddc', '--clean-audio-file', default="./audio/target.wav", type=str)
     p.add_argument('-md', '--mask-duration', default=0.002, type=float)
@@ -19,7 +19,7 @@ def get_args():
     p.add_argument('-ph', '--patch-height', default=1, type=int)
     p.add_argument('-pw', '--patch-width', default=400, type=int)
     p.add_argument('-k', '--Ksize', default=64, type=int)
-    p.add_argument('-ins', '--inner-net-shape', default=[512, 64]) 
+    p.add_argument('-ins', '--inner-net-shape', default=[512, 64]) # middle, hidden layer dimensions
     p.add_argument('-minlr', '--min-lr', default=0.0001, type=float) 
     p.add_argument('-maxlr', '--max-lr', default=0.001, type=float)
     p.add_argument('-bs', '--batch-size', default=32, type=int)
@@ -29,7 +29,7 @@ def get_args():
 
     args = p.parse_args()
 
-    args.output_directory = ".../out/{}".format(
+    args.output_directory = "./out/{}".format(
         os.environ["SLURM_JOBID"]
         if "SLURM_JOBID" in os.environ
         else datetime.datetime.fromtimestamp(time.time()).strftime("%y-%m-%d-%H-%M-%S")

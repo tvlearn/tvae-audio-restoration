@@ -74,27 +74,20 @@ def eval_fn(
     target: Union[np.ndarray, to.Tensor],
     reco: Union[np.ndarray, to.Tensor],
     data_range: int = None,
+    device=None,
 ) -> to.Tensor:
     return to.tensor(
         peak_signal_noise_ratio(
             target.detach().cpu().numpy() if isinstance(target, to.Tensor) else target,
             reco.detach().cpu().numpy() if isinstance(reco, to.Tensor) else reco,
             data_range=data_range,
-        )
-    )
-
-def eval_fn_wav(
-    target: Union[np.ndarray, to.Tensor],
-    reco: Union[np.ndarray, to.Tensor],
-    device=None,
-) -> to.Tensor:
-    return to.tensor(
+        )), to.tensor(
         compute_snr_metric(
             target.detach().cpu().numpy() if isinstance(target, to.Tensor) else target,
             reco.detach().cpu().numpy() if isinstance(reco, to.Tensor) else reco
-        )), to.tensor(compute_si_snr_metric(target, reco, device)
-    )
-
+        )), to.tensor(
+         compute_si_snr_metric(target, reco, device)
+        )   
 
 def compute_SNR(ref, est):
         snr =  np.sum(ref**2) / np.sum((ref-est)**2)  

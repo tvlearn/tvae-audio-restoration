@@ -21,7 +21,7 @@ def get_args():
     p.add_argument('-np', '--n-parents', default=5, type=int)
     p.add_argument('-nc', '--n-children', default=4, type=int) 
     p.add_argument('-ng', '--n-generations', default=1, type=int) 
-    p.add_argument('-ins', '--inner-net-shape', default=[512, 64]) 
+    p.add_argument('-ins', '--inner-net-shape', default=[512, 64]) # middle, hidden layer dimensions
     p.add_argument('-minlr', '--min-lr', default=0.0001, type=float)
     p.add_argument('-maxlr', '--max-lr', default=0.001, type=float)
     p.add_argument('-bs', '--batch-size', default=32, type=int)

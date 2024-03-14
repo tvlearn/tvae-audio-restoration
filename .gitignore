@@ -3,3 +3,10 @@
 
 # pycache
 *.pyc
+
+#h5 files
+*.h5
+*.h5.old
+
+#text files
+*.txt
