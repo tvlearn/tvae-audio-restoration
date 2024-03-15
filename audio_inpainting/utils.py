@@ -36,14 +36,17 @@ class stdout_logger(object):
         pass
 
 
-def set_pixels_to_nan(image: to.Tensor, percentage: int) -> to.Tensor:
-    set_to_nan = to.rand_like(image) < percentage / 100.0
-    image_with_nans = image.clone().detach()
-    image_with_nans[set_to_nan] = float("nan")
-    print(f"Randomly set {percentage} % of pixels to nan")
-    return image_with_nans
-
 def set_zero_mask(clean, sr, mask_duration, num_masks):
+    """
+    Takes the clean audio and randomly zero-masks a segment  
+    of length mask_duration, 
+    segment size in samples = mask_duration * sr
+
+    :param clean: clean audio file
+    :param sr: sampling rate
+    :param mask_duration: duration of zero mask in seconds
+    :param num_masks: number of zero masks (default = 1)
+    """
     masked_audio = clean
     sample_mask_length = int(mask_duration*sr)
     clean_length = len(clean)
@@ -76,6 +79,10 @@ def eval_fn(
     data_range: int = None,
     device=None,
 ) -> to.Tensor:
+    """
+    Takes the ground truth audio and the reconstruction and outputs 
+    the computed PSNR, SNR and SI-SNR measures
+    """
     return to.tensor(
         peak_signal_noise_ratio(
             target.detach().cpu().numpy() if isinstance(target, to.Tensor) else target,
@@ -90,22 +97,39 @@ def eval_fn(
         )   
 
 def compute_SNR(ref, est):
+        """
+        Computing signal-to-noise ratio (SNR) between the reconstucted 
+        signal and ground truth (target)
+        """
         snr =  np.sum(ref**2) / np.sum((ref-est)**2)  
         snr = 10*np.log10(snr)
         return snr.round(decimals=2)
 
 def compute_snr_metric(clean, reconstructed: to.Tensor) -> int:
+        """
+        Computing signal-to-noise ratio (SNR) between the reconstucted 
+        signal and ground truth (target)
+        """
         assert reconstructed.shape == clean.shape
         snr = compute_SNR(clean, np.clip(reconstructed, -1.0, 1.0))
         return snr
 
 def compute_si_snr_metric(clean, reconstructed: to.Tensor, device) -> int:
+        """
+        Computing signal invariant signal-to-noise ratio (SI-SNR) 
+        (Source:https://torchmetrics.readthedocs.io/en/v0.8.2/audio/scale_invariant_signal_noise_ratio.html) 
+        between the reconstucted signal and ground truth (target)
+        """
         assert reconstructed.shape == clean.shape
         si_snr = ScaleInvariantSignalNoiseRatio().to(device)
         si_snr_value = si_snr(reconstructed, clean)
         return si_snr_value 
 
 def compute_pesq_metric(clean, reconstructed: to.Tensor) -> int:
+        """
+        Computing PESQ wideband measure (Source: https://github.com/ludlows/PESQ) 
+        between the reconstucted signal and ground truth (target)
+        """
         assert reconstructed.shape == clean.shape
         reconstructed = reconstructed[0, :]
         clean = clean[0, :]

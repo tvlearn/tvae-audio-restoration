@@ -71,6 +71,7 @@ def audio_denoising():
 
     # overlapping audio "chunks" are extracted (here called "patches")
     ovp = OverlappingPatches(noisy[None, ...], args.patch_height, args.patch_width, patch_shift=1)
+    # overlapping chunks are the training data
     train_data = ovp.get().t()
     store_as_h5({"data": train_data}, data_file)
 
@@ -153,11 +154,12 @@ def audio_denoising():
             # add to data logger 
             if to_log is not None:
                 logger.append_and_write(**to_log)
-            snr_str = f"{snr:.2f}".replace(".", "_")
+            snr_str = f"{snr:.2f}".replace("-", "m").replace(".", "_")
             pesq_str = f"{pesq:.2f}".replace(".", "_")
             psnr_str = f"{psnr:.2f}".replace(".", "_")
             wav_file = f"{args.output_directory}/reco-epoch{epoch-1}-snr{snr_str}-pesq{pesq_str}-psnr{psnr_str}.wav"
             reco_audio = reco.squeeze(0).detach().cpu().numpy()
+            # write reconstruction audio file
             sf.write(wav_file, reco_audio, sr)
             print(f"Wrote {wav_file}")
 

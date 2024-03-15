@@ -49,7 +49,7 @@ def audio_inpainting():
     print("Will write training output to {}.".format(training_file))
     print("Will write terminal output to {}".format(txt_file))
 
-    # generate incomplete image and extract image patches
+    # read in the clean/target audio file to be corrupted
     clean, sr = librosa.load(args.clean_audio_file, sr=16000) 
     clean = to.tensor(clean).to(**dtype_device_kwargs) 
 
@@ -57,7 +57,7 @@ def audio_inpainting():
     # of mask duration (in seconds) 
     incomplete = set_zero_mask(clean, sr, args.mask_duration, args.num_masks)
     
-    # save incomplete (zero-masked) audio
+    # save the incomplete (zero-masked) audio file
     wav_file = f"{args.output_directory}/incomplete-{args.mask_duration}-missing.wav"
     incomplete_wav = incomplete.detach().cpu().numpy() 
 
@@ -67,6 +67,7 @@ def audio_inpainting():
 
     # overlapping audio "chunks" are extracted (here called "patches")
     ovp = OverlappingPatches(incomplete[None, ...], args.patch_height, args.patch_width, patch_shift=1) 
+    # overlapping chunks are the training data
     train_data = ovp.get().t()
     store_as_h5({"data": train_data}, data_file)
 
@@ -140,11 +141,11 @@ def audio_inpainting():
             # add to data logger 
             if to_log is not None:
                 logger.append_and_write(**to_log)
-            si_snr_str = f"{si_snr:.2f}".replace(".", "_")
+            si_snr_str = f"{si_snr:.2f}".replace("-", "m").replace(".", "_")
             psnr_str = f"{psnr:.2f}".replace(".", "_")
             wav_file = f"{args.output_directory}/reco-epoch{epoch-1}-si-snr{si_snr_str}-psnr{psnr_str}.wav"
             reco_audio = reco.squeeze(0).detach().cpu().numpy()
-            
+            # write reconstruction audio file
             sf.write(wav_file, reco_audio, sr)
             print(f"Wrote {wav_file}")
 
