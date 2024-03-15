@@ -14,7 +14,7 @@ We recommend [Anaconda](https://www.anaconda.com/) to manage the installation, a
 $ conda env create -n tvae-audio python==3.8.10 gcc_linux-64 
 $ conda activate tvae-audio
 ```
-Mac users can comment out ```bash gcc_linux-64```. 
+Mac users can comment out ```gcc_linux-64```. 
 Install the required packages via pip:
 
 ```bash
