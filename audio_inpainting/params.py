@@ -13,7 +13,7 @@ def get_args():
         description="Audio inpainting with missing excerpts (masks) of 0.001-0.005 seconds"
     )
     p.add_argument('-ddc', '--clean-audio-file', default="./audio/target.wav", type=str) # path to clean/target audio file
-    p.add_argument('-md', '--mask-duration', default=0.002, type=float) # duration of zero mask in seconds
+    p.add_argument('-md', '--mask-duration', default=0.001, type=float) # duration of zero mask in seconds
     p.add_argument('-nm', '--num-masks', default=1, type=float) # number of zero masks
     p.add_argument('-ph', '--patch-height', default=1, type=int) # overlapping chunk height
     p.add_argument('-pw', '--patch-width', default=400, type=int) # overlapping chunk width, T

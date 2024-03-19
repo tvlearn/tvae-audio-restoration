@@ -10,3 +10,8 @@
 
 #text files
 *.txt
+
+#slurm files
+*.sh
+*.out
+*.err
