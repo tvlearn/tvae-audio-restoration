@@ -24,7 +24,7 @@ $ pip install -r requirements.txt
 The `tvo` package can be installed via:
 
 ```bash
-$ git clone https://github.com/tvlearn/tvo.git
+$ git clone -b tvae-audio-restoration https://github.com/tvlearn/tvo.git
 $ cd tvo
 $ python setup.py build_ext
 $ python setup.py install
