@@ -8,9 +8,6 @@
 *.h5
 *.h5.old
 
-#text files
-*.txt
-
 #slurm files
 *.sh
 *.out

@@ -39,9 +39,19 @@ $ cd tvutil
 $ python setup.py install
 $ cd ..
 ```
+To perform audio denoising or audio inpainting, add the corrupted and, if available, the clean audio files (.wav) to the directories audio_denoising/audio/ or audio_inpaining/audio/, correspondingly.
+
+To train TVAE on a corrupted audio file run:
+```bash
+$ env HDF5_USE_FILE_LOCKING='FALSE' python main.py  
+```
+Please check params.py file to see which parameters can be modified (such as paths to your corrupted files, whether only noisy file is provided, etc.) 
+
+To exploit GPU parallelization, run ```env HDF5_USE_FILE_LOCKING='FALSE' TVO_GPU=0 python main.py```. GPU execution requires a cudatoolkit installation. 
 
 ## Reference
 
 ```bibtex
-@inproceedings{}
+@inproceedings{
+}
 ```
