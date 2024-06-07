@@ -3,7 +3,7 @@
 ## Overview 
 The [audio denoising](./audio_denoising) and [audio inpainting](./audio_inpainting) directories contain implementations of the experiments described in the [paper](). Execution requires an installation of the [Truncated Variational Optimization](https://github.com/tvlearn/tvo) (TVO) framework, which implements the Truncated Variational Autoencoder (TVAE). Experiments furthermore leverage pre-/postprocessing provided by [tvutil](https://github.com/tvlearn/tvutil).
 
-Please follow the [Setup](#setup) instructions described below to run the experiments. Please consult the README files in the sub-directories for further instructions.
+Please follow the [Setup](#setup) instructions described below to run the experiments. 
 
 The code has only been tested on Linux systems.
 
