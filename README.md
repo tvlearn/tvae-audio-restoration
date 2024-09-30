@@ -1,7 +1,7 @@
 # Blind Zero-Shot Audio Restoration: A Variational Autoencoder Approach for Denoising and Inpainting
 
 ## Overview 
-The [audio denoising](./audio_denoising) and [audio inpainting](./audio_inpainting) directories contain implementations of the experiments described in the [paper]() (accepted, to be published). Execution requires an installation of the [Truncated Variational Optimization](https://github.com/tvlearn/tvo) (TVO) framework, which implements the Truncated Variational Autoencoder (TVAE). Experiments furthermore leverage pre-/postprocessing provided by [tvutil](https://github.com/tvlearn/tvutil).
+The [audio denoising](./audio_denoising) and [audio inpainting](./audio_inpainting) directories contain implementations of the experiments described in the [paper](https://www.isca-archive.org/interspeech_2024/boukun24_interspeech.html). Execution requires an installation of the [Truncated Variational Optimization](https://github.com/tvlearn/tvo) (TVO) framework, which implements the Truncated Variational Autoencoder (TVAE). Experiments furthermore leverage pre-/postprocessing provided by [tvutil](https://github.com/tvlearn/tvutil).
 
 Please follow the [Setup](#setup) instructions described below to run the experiments. 
 
@@ -53,5 +53,10 @@ To exploit GPU parallelization, run ```env HDF5_USE_FILE_LOCKING='FALSE' TVO_GPU
 
 ```bibtex
 @inproceedings{
+    title={{Blind Zero-Shot Audio Restoration: A Variational Autoencoder Approach for Denoising and Inpainting. Proc. Interspeech}},
+    author={Boukun, Veranika and Drefs, Jakob and L{\"u}cke, J{\"o}rg},
+    booktitle = {Proc. Interspeech 2024},
+    year={2024},
+    pages = {4823--4827},
 }
 ```
