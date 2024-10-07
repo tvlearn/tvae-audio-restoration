@@ -11,7 +11,7 @@ The code has only been tested on Linux systems.
 We recommend [Anaconda](https://www.anaconda.com/) to manage the installation, and to create a new environment for hosting the installed packages:
 
 ```bash
-$ conda env create -n tvae-audio python==3.8.10 gcc_linux-64 
+$ conda create -n tvae-audio python==3.8.10 gcc_linux-64 
 $ conda activate tvae-audio
 ```
 Mac users can comment out ```gcc_linux-64```. 
